@@ -1,0 +1,64 @@
+---
+title: "fur_production_denmark"
+author: "Kelsey Wu"
+date: "4/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(patchwork)
+```
+
+```{r production_plot, echo = FALSE}
+
+# Read in excel file downloaded from StatBank Denmark
+
+fur_production_denmark <- read_excel("fur_production_denmark.xlsx") %>%
+  
+  # Pivot table, so that each observation consists of year, animal
+  # species, and production
+  
+  pivot_longer(cols = c(Mink, Fox, Chinchilla), 
+               names_to = "animal", 
+               values_to = "production")
+
+# Change year variable to a continuous numeric variable
+
+fur_production_denmark$Year = as.numeric(fur_production_denmark$Year)
+
+# Create plot
+
+fur_production_denmark %>%
+  
+  # Set ggplot
+  
+  ggplot() + 
+  
+  # Set line graph
+  
+  geom_line(aes(x = Year, y = production)) +
+  
+  # Facet graph based on animal species, use different scales for each
+  
+  facet_wrap(~ animal, scales = "free") +
+  
+  # Add title, subtitle, axes labels, source
+  
+  labs(
+    title = "Production of furred animals by species of animals in Denmark",
+    subtitle = "Mink production has been increasing",
+    y = "Production (1000 apiece)",
+    x = "Animal species",
+    caption = "Source: StatBank Denmark"
+  ) + 
+  
+  # Grey theme
+  
+  theme_grey()
+```
